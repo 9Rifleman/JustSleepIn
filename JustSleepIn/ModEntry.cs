@@ -20,15 +20,30 @@ namespace JustSleepIn
         public const string SunSettingDown = "The sun is slowly setting down on your farm.^^There is still light outside, but you can set your alarm clock now, if you don't intend to sleep in.^^Select the time to wake up:";
         public const string SunSetDown = "The sun has set down on your farm.^^There is still time be an early bird and get a good long sleep as well. But you can always just sleep in.^^Select the time to wake up:";
         public const string GettingVeryLate = "It's getting quite late. You should set your alarm clock if you want to be an early bird. Or just sleep in and get your beauty nap.^^Select the time to wake up:";
+        public const string ManualSetup = "When would you like to wake up tomorrow?.^^Select the time to wake up:";
         public string AlarmClockMessage = "";
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
-            //helper.Events.GameLoop.TimeChanged += this.DebugTimeSkipper;          // Just for testing
+            //helper.Events.Input.ButtonPressed += this.DebugTimeSkipper;          // Just for debug
+
             helper.Events.GameLoop.DayStarted += this.DayStarted;
             helper.Events.GameLoop.TimeChanged += this.AlarmClockSelection;
+            helper.Events.Input.ButtonPressed += this.ManualDialog;
+        }
+
+        private void ManualDialog(object sender, ButtonPressedEventArgs e)
+        {
+            // ignore if player hasn't loaded a save yet
+            if (!Context.IsWorldReady)
+                return;
+
+            if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
+            {
+                AlarmClockSelectionManual();
+            }
         }
 
         public void DialogueSet(Farmer who, string dialogue_id)
@@ -76,7 +91,7 @@ namespace JustSleepIn
         private void AlarmClockSelection(object sender, TimeChangedEventArgs e)
         {
             AlarmClockReminder = Game1.getTrulyDarkTime();
-            if (Game1.timeOfDay == AlarmClockReminder-200)
+            if (Game1.timeOfDay == AlarmClockReminder - 200)
             {
                 AlarmClockMessage = SunSettingDown;
             }
@@ -90,12 +105,22 @@ namespace JustSleepIn
                 AlreadyAsked = false;
                 AlarmClockMessage = GettingVeryLate;
             }
+            else
+            {
+                AlarmClockMessage = ManualSetup;
+            }
 
             if (Game1.timeOfDay >= (AlarmClockReminder-200) && AlarmClockSet == false && Game1.player.currentLocation == Game1.getLocationFromName("FarmHouse") && Game1.timeOfDay < 2200 && AlreadyAsked == false)
                 AlarmClockDialogSetupEarly();                     
 
             else if (Game1.timeOfDay == 2200 && AlarmClockSet == false)
                 AlarmClockDialogSetupLate();
+        }
+
+        private void AlarmClockSelectionManual()
+        {
+            AlarmClockMessage = ManualSetup;
+            AlarmClockDialogSetupEarly(); 
         }
 
         private void DayStarted(object sender, DayStartedEventArgs e)
@@ -147,10 +172,15 @@ namespace JustSleepIn
             Game1.currentLocation.createQuestionDialogue(AlarmClockMessage, choices.ToArray(), new GameLocation.afterQuestionBehavior(DialogueSet));
         }
 
-        /*private void DebugTimeSkipper(object sender, TimeChangedEventArgs e)
+        private void DebugTimeSkipper(object sender, ButtonPressedEventArgs e)
         {
-            if (Game1.timeOfDay == 0610)
-                Game1.timeOfDay = 1730;
-        }*/
+            if (!Context.IsWorldReady)
+                return;
+
+            if (this.Helper.Input.IsDown(SButton.B))
+            {
+                Game1.timeOfDay += 200;
+            }
+        }
     }
 }
