@@ -49,7 +49,7 @@ namespace JustSleepIn
         public void EditImpl(IAssetData asset)
         {
             var data = asset.AsDictionary<string, string>().Data;
-            data["JSIWizardMail1"] = "Hello, @!^^To set the clock manually at any time, press Tilde(or Left Stick).^To disable or enable the RP prompts, press V.^^Have fun! [#]Just Sleep In";
+            data["JSIWizardMail1"] = "Hello, @!^^To set the clock manually at any time, press Tilde(or Left Stick).^To disable or enable the RP prompts, press V.^^Here's a little something to get you going.^^Have fun! %item object 201 1 %%[#]Just Sleep In";
         }
 
         private void DayStarted(object sender, DayStartedEventArgs e)
@@ -73,6 +73,17 @@ namespace JustSleepIn
                 AlarmClockSet = false;
             }
             location.playSound("rooster");
+        }
+
+        private void ManualDialog(object sender, ButtonPressedEventArgs e)
+        {
+            if (!Context.IsWorldReady)
+                return;
+
+            if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
+            {
+                AlarmClockSelectionManual();
+            }
         }
 
         private void TurnOffSwitch(object sender, ButtonPressedEventArgs e)
@@ -209,24 +220,13 @@ namespace JustSleepIn
             Game1.currentLocation.createQuestionDialogue(AlarmClockMessage, choices.ToArray(), new GameLocation.afterQuestionBehavior(DialogueSet));
         }
 
-        private void ManualDialog(object sender, ButtonPressedEventArgs e)
-        {
-            if (!Context.IsWorldReady)
-                return;
-
-            if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
-            {
-                AlarmClockSelectionManual();
-            }
-        }
-
         private void DayEnding(object sender, DayEndingEventArgs e)
         {
             Game1.addMailForTomorrow("JSIWizardMail1");
             LetterObtained = true;
         }
 
-        private void DebugTimeSkipper(object sender, ButtonPressedEventArgs e)
+        private void DebugButtons(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady)
                 return;
