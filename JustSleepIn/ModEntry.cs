@@ -55,7 +55,6 @@ namespace JustSleepIn
         private void DayStarted(object sender, DayStartedEventArgs e)
         {
             GameLocation location = new();
-            location.playSound("rooster");
             if (SetWakeUpTime == 0)
             {
                 Game1.timeOfDay = 0600;
@@ -72,7 +71,8 @@ namespace JustSleepIn
             else
             {
                 AlarmClockSet = false;
-            }          
+            }
+            location.playSound("rooster");
         }
 
         private void TurnOffSwitch(object sender, ButtonPressedEventArgs e)
