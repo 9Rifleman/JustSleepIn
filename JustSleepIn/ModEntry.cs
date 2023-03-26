@@ -30,9 +30,10 @@ namespace JustSleepIn
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
-            //helper.Events.Input.ButtonPressed += this.DebugTimeSkipper;          // Just for debug
+            //helper.Events.Input.ButtonPressed += this.DebugButtons;          // Just for debug
 
             helper.Events.GameLoop.DayStarted += this.DayStarted;
+            helper.Events.GameLoop.DayEnding += this.DayEnding;
             helper.Events.GameLoop.TimeChanged += this.AlarmClockSelection;
             helper.Events.Input.ButtonPressed += this.ManualDialog;
             helper.Events.Input.ButtonPressed += this.TurnOffSwitch;
@@ -48,7 +49,7 @@ namespace JustSleepIn
         public void EditImpl(IAssetData asset)
         {
             var data = asset.AsDictionary<string, string>().Data;
-            data["JSIMail1"] = "Test JSI mail.";
+            data["JSIWizardMail1"] = "Hello, @!^^To set the clock manually at any time, press Tilde(or Left Stick).^To disable or enable the RP prompts, press V.^^Have fun! [#]Just Sleep In";
         }
 
         private void DayStarted(object sender, DayStartedEventArgs e)
@@ -71,13 +72,7 @@ namespace JustSleepIn
             else
             {
                 AlarmClockSet = false;
-            }
-            if (LetterObtained == false)
-            {
-                Game1.mailbox.Add("JSIMail1");
-                LetterObtained = true;
-            }
-            
+            }          
         }
 
         private void TurnOffSwitch(object sender, ButtonPressedEventArgs e)
@@ -225,6 +220,12 @@ namespace JustSleepIn
             }
         }
 
+        private void DayEnding(object sender, DayEndingEventArgs e)
+        {
+            Game1.addMailForTomorrow("JSIWizardMail1");
+            LetterObtained = true;
+        }
+
         private void DebugTimeSkipper(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady)
@@ -232,7 +233,8 @@ namespace JustSleepIn
 
             if (this.Helper.Input.IsDown(SButton.B))
             {
-                Game1.timeOfDay += 200;
+                Game1.player.mailReceived.Remove("JSIWizardMail1");
+
             }
             if (this.Helper.Input.IsDown(SButton.H))
             {
