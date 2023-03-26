@@ -17,6 +17,9 @@ namespace JustSleepIn
         public int AlarmClockReminder = 0;
         public bool AlarmClockSet = false;
         public bool AlreadyAsked = false;
+        public bool ClockTurnedOff = false;
+        public bool LetterObtained = false;
+        
         public const string SunSettingDown = "The sun is slowly setting down on your farm.^^There is still light outside, but you can set your alarm clock now, if you don't intend to sleep in.^^Select the time to wake up:";
         public const string SunSetDown = "The sun has set down on your farm.^^There is still time be an early bird and get a good long sleep as well. But you can always just sleep in.^^Select the time to wake up:";
         public const string GettingVeryLate = "It's getting quite late. You should set your alarm clock if you want to be an early bird. Or just sleep in and get your beauty nap.^^Select the time to wake up:";
@@ -32,19 +35,73 @@ namespace JustSleepIn
             helper.Events.GameLoop.DayStarted += this.DayStarted;
             helper.Events.GameLoop.TimeChanged += this.AlarmClockSelection;
             helper.Events.Input.ButtonPressed += this.ManualDialog;
+            helper.Events.Input.ButtonPressed += this.TurnOffSwitch;
+            helper.Events.Content.AssetRequested += this.TutorialMail;
         }
 
-        private void ManualDialog(object sender, ButtonPressedEventArgs e)
+        private void TutorialMail(object? sender, AssetRequestedEventArgs e)
         {
-            // ignore if player hasn't loaded a save yet
+            if (e.NameWithoutLocale.IsEquivalentTo("Data/mail"))
+                e.Edit(this.EditImpl);
+        }
+
+        public void EditImpl(IAssetData asset)
+        {
+            var data = asset.AsDictionary<string, string>().Data;
+            data["JSIMail1"] = "Test JSI mail.";
+        }
+
+        private void DayStarted(object sender, DayStartedEventArgs e)
+        {
+            GameLocation location = new();
+            location.playSound("rooster");
+            if (SetWakeUpTime == 0)
+            {
+                Game1.timeOfDay = 0600;
+            }
+            else
+            {
+                Game1.timeOfDay = SetWakeUpTime;
+                SetWakeUpTime = 0;
+            }
+            if (ClockTurnedOff == true)
+            {
+                AlarmClockSet = true;
+            }
+            else
+            {
+                AlarmClockSet = false;
+            }
+            if (LetterObtained == false)
+            {
+                Game1.mailbox.Add("JSIMail1");
+                LetterObtained = true;
+            }
+            
+        }
+
+        private void TurnOffSwitch(object sender, ButtonPressedEventArgs e)
+        {
             if (!Context.IsWorldReady)
                 return;
 
-            if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
+            if (this.Helper.Input.IsDown(SButton.V) || this.Helper.Input.IsDown(SButton.LeftStick))
             {
-                AlarmClockSelectionManual();
+                if (ClockTurnedOff == false)
+                {
+                    Game1.addHUDMessage(new HUDMessage("Just Sleep In pop-ups disabled.", 3));
+                    ClockTurnedOff = true;
+                    AlarmClockSet = true;
+                }
+                else
+                {
+                    Game1.addHUDMessage(new HUDMessage("Just Sleep In pop-ups enabled.", 2));
+                    ClockTurnedOff = false;
+                    AlarmClockSet = false;
+                }
             }
         }
+      
 
         public void DialogueSet(Farmer who, string dialogue_id)
         {
@@ -123,21 +180,6 @@ namespace JustSleepIn
             AlarmClockDialogSetupEarly(); 
         }
 
-        private void DayStarted(object sender, DayStartedEventArgs e)
-        {
-            GameLocation location = new();
-            location.playSound("rooster");
-            if (SetWakeUpTime == 0)
-            {
-                Game1.timeOfDay = 0600;
-            }
-            else
-            {
-                Game1.timeOfDay = SetWakeUpTime;
-                SetWakeUpTime = 0;               
-            }
-            AlarmClockSet = false;
-        }
 
         private void AlarmClockDialogSetupEarly()
         {
@@ -172,6 +214,17 @@ namespace JustSleepIn
             Game1.currentLocation.createQuestionDialogue(AlarmClockMessage, choices.ToArray(), new GameLocation.afterQuestionBehavior(DialogueSet));
         }
 
+        private void ManualDialog(object sender, ButtonPressedEventArgs e)
+        {
+            if (!Context.IsWorldReady)
+                return;
+
+            if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
+            {
+                AlarmClockSelectionManual();
+            }
+        }
+
         private void DebugTimeSkipper(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady)
@@ -180,6 +233,10 @@ namespace JustSleepIn
             if (this.Helper.Input.IsDown(SButton.B))
             {
                 Game1.timeOfDay += 200;
+            }
+            if (this.Helper.Input.IsDown(SButton.H))
+            {
+                Game1.timeOfDay += 10;
             }
         }
     }
