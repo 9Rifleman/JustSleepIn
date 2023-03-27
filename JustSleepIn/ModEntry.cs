@@ -49,7 +49,7 @@ namespace JustSleepIn
         public void EditImpl(IAssetData asset)
         {
             var data = asset.AsDictionary<string, string>().Data;
-            data["JSIWizardMail1"] = "Hello, @!^^To set the clock manually at any time, press Tilde(or Left Stick).^To disable or enable the RP prompts, press V.^^Here's a little something to get you going.^^Have fun! %item object 201 1 %%[#]Just Sleep In";
+            data["JSIWizardMail1"] = "Hello, @!^^To set the alarm clock manually at any time press V (or Xbox button).^To disable or enable the RP prompts press ~ (or Left Stick).^^Here's a little something to get you going.^^Have fun! %item object 201 1 %%[#]Just Sleep In";
         }
 
         private void DayStarted(object sender, DayStartedEventArgs e)
@@ -80,7 +80,7 @@ namespace JustSleepIn
             if (!Context.IsWorldReady)
                 return;
 
-            if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
+            if (this.Helper.Input.IsDown(SButton.V) || this.Helper.Input.IsDown(SButton.BigButton))
             {
                 AlarmClockSelectionManual();
             }
@@ -91,17 +91,17 @@ namespace JustSleepIn
             if (!Context.IsWorldReady)
                 return;
 
-            if (this.Helper.Input.IsDown(SButton.V) || this.Helper.Input.IsDown(SButton.LeftStick))
+            if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
             {
                 if (ClockTurnedOff == false)
                 {
-                    Game1.addHUDMessage(new HUDMessage("Just Sleep In pop-ups disabled.", 3));
+                    Game1.addHUDMessage(new HUDMessage("Just Sleep In pop-ups disabled.", ""));
                     ClockTurnedOff = true;
                     AlarmClockSet = true;
                 }
                 else
                 {
-                    Game1.addHUDMessage(new HUDMessage("Just Sleep In pop-ups enabled.", 2));
+                    Game1.addHUDMessage(new HUDMessage("Just Sleep In pop-ups enabled.", ""));
                     ClockTurnedOff = false;
                     AlarmClockSet = false;
                 }
