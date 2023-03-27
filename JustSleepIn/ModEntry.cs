@@ -49,7 +49,7 @@ namespace JustSleepIn
         public void EditImpl(IAssetData asset)
         {
             var data = asset.AsDictionary<string, string>().Data;
-            data["JSIWizardMail1"] = "Hello, @!^^To set the alarm clock manually at any time press V (or Xbox button).^To disable or enable the RP prompts press ~ (or Left Stick).^^Here's a little something to get you going.^^Have fun! %item object 201 1 %%[#]Just Sleep In";
+            data["JSIWizardMail1"] = "Hello, @!^^You can set the alarm clock manually at any time press V (or Xbox button).^To disable or enable the RP prompts press ~ (or Left Stick).^^Here's a little something to get you going.^^Have fun! %item object 201 1 %%[#]Just Sleep In";
         }
 
         private void DayStarted(object sender, DayStartedEventArgs e)
