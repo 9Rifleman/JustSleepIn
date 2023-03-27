@@ -36,7 +36,6 @@ namespace JustSleepIn
 
         private void ManualDialog(object sender, ButtonPressedEventArgs e)
         {
-            // ignore if player hasn't loaded a save yet
             if (!Context.IsWorldReady)
                 return;
 
