@@ -31,7 +31,6 @@ namespace JustSleepIn
         public override void Entry(IModHelper helper)
         {
             //helper.Events.Input.ButtonPressed += this.DebugButtons;          // Just for debug
-
             helper.Events.GameLoop.DayStarted += this.DayStarted;
             helper.Events.GameLoop.DayEnding += this.DayEnding;
             helper.Events.GameLoop.TimeChanged += this.AlarmClockSelection;
