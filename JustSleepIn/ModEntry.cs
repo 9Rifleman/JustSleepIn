@@ -17,7 +17,7 @@ namespace JustSleepIn
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod
     {
-        ModConfig Config = new ModConfig();
+        ModConfig Config = new();
         
         public int SetWakeUpTime = 0;
         public int AlarmClockReminder = 0;
@@ -208,7 +208,7 @@ namespace JustSleepIn
 
         private void AlarmClockDialogSetupEarly()
         {
-            List<Response> choices = new List<Response>()
+            List<Response> choices = new()
                 {
                 new Response("dialogue_id1", "6:00AM"),
                 new Response("dialogue_id2", "7:00AM"),
@@ -225,7 +225,7 @@ namespace JustSleepIn
 
         private void AlarmClockDialogSetupLate()
         {
-            List<Response> choices = new List<Response>()
+            List<Response> choices = new()
                 {
                 new Response("dialogue_id1", "6:00AM"),
                 new Response("dialogue_id2", "7:00AM"),
