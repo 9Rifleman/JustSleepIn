@@ -10,9 +10,15 @@ using StardewValley.GameData;
 
 namespace JustSleepIn
 {
+    public class ModConfig
+    {
+        public KeybindList StaticTimeToggle { get; set; } = KeybindList.Parse("LeftControl + OemTilde");
+    }
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod
     {
+        ModConfig Config = new ModConfig();
+        
         public int SetWakeUpTime = 0;
         public int AlarmClockReminder = 0;
         public bool AlarmClockSet = false;
@@ -38,6 +44,21 @@ namespace JustSleepIn
             helper.Events.Input.ButtonPressed += this.ManualDialog;
             helper.Events.Input.ButtonPressed += this.TurnOffSwitch;
             helper.Events.Content.AssetRequested += this.TutorialMail;
+            //helper.Events.Input.ButtonsChanged += this.StaticTimeSetter;
+        }
+
+        private void StaticTimeSetter(object sender, ButtonsChangedEventArgs e)
+        {
+            if (!Context.IsWorldReady)
+                return;
+            if (this.Config.StaticTimeToggle.JustPressed())
+            {
+                if (this.Helper.Input.IsDown(SButton.V) || this.Helper.Input.IsDown(SButton.BigButton))
+                {
+                    this.Helper.Input.Suppress(SButton.V);
+                }
+                Game1.addHUDMessage(new HUDMessage("It works!", ""));
+            }
         }
 
         private void TutorialMail(object? sender, AssetRequestedEventArgs e)
@@ -88,9 +109,7 @@ namespace JustSleepIn
 
         private void TurnOffSwitch(object sender, ButtonPressedEventArgs e)
         {
-            if (!Context.IsWorldReady)
-                return;
-
+            if (!Context.IsWorldReady) return;
             if (this.Helper.Input.IsDown(SButton.OemTilde) || this.Helper.Input.IsDown(SButton.LeftStick))
             {
                 if (ClockTurnedOff == false)
@@ -168,10 +187,10 @@ namespace JustSleepIn
                 AlreadyAsked = false;
                 AlarmClockMessage = GettingVeryLate;
             }
-            else
+            /*else
             {
                 AlarmClockMessage = ManualSetup;
-            }
+            }*/
 
             if (Game1.timeOfDay >= (AlarmClockReminder-200) && AlarmClockSet == false && Game1.player.currentLocation == Game1.getLocationFromName("FarmHouse") && Game1.timeOfDay < 2200 && AlreadyAsked == false)
                 AlarmClockDialogSetupEarly();                     
